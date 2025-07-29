@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Play, Pause, RotateCcw, Settings, Plus, Minus, Music2, Loader } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 // Mock API functions - replace these with your actual API calls
 const mockAPI = {
@@ -95,7 +96,7 @@ function LoadingSpinner({ message = "Loading..." }) {
 function SongCard({ song, isSelected, onSelect }) {
   return (
     <div
-      className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-lg ${
+      className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all hover:shadow-lg ${
         isSelected 
           ? 'border-amber-400 bg-amber-900/30 shadow-amber-400/20' 
           : 'border-amber-900/20 bg-gray-800 hover:bg-gray-700 hover:border-amber-600/40'
@@ -103,8 +104,8 @@ function SongCard({ song, isSelected, onSelect }) {
       onClick={() => onSelect(song)}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className="text-amber-400 font-bold text-lg">{song.title}</h3>
-        <span className={`px-2 py-1 rounded text-xs font-medium ${
+        <h3 className="text-amber-400 font-bold text-sm sm:text-base lg:text-lg pr-2 truncate">{song.title}</h3>
+        <span className={`px-2 py-1 rounded text-xs font-medium flex-shrink-0 ${
           song.difficulty === 'Beginner' ? 'bg-green-900/30 text-green-400' :
           song.difficulty === 'Intermediate' ? 'bg-yellow-900/30 text-yellow-400' :
           'bg-red-900/30 text-red-400'
@@ -112,7 +113,7 @@ function SongCard({ song, isSelected, onSelect }) {
           {song.difficulty}
         </span>
       </div>
-      <p className="text-gray-300 text-sm mb-2">{song.artist}</p>
+      <p className="text-gray-300 text-xs sm:text-sm mb-2 truncate">{song.artist}</p>
       <div className="flex items-center justify-between text-xs text-gray-400">
         <span>Key: <strong className="text-amber-300">{song.originalKey}</strong></span>
         <span>{song.lyrics?.length || 0} lines</span>
@@ -123,6 +124,7 @@ function SongCard({ song, isSelected, onSelect }) {
 
 // Main Player Component
 export default function GuitarTabsPlayer() {
+  const isMobile = useIsMobile()
   const [songs, setSongs] = useState([])
   const [selectedSong, setSelectedSong] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -302,33 +304,33 @@ export default function GuitarTabsPlayer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-amber-400 mb-4">
-            <Music2 className="inline-block w-10 h-10 mr-3" />
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-400 mb-2 sm:mb-4">
+            <Music2 className="inline-block w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 mr-2 sm:mr-3" />
             Guitar Chords & Tabs
           </h1>
-          <p className="text-gray-300 text-lg">Interactive chord charts with auto-scroll functionality</p>
+          <p className="text-gray-300 text-sm sm:text-base lg:text-lg px-4">Interactive chord charts with auto-scroll functionality</p>
         </div>
 
         {/* Song Selector */}
-        <Card className="bg-black/50 border-amber-900/30 mb-6">
-          <CardHeader>
-            <CardTitle className="text-amber-400 flex items-center justify-between">
-              <span>Select Song ({songs.length} available)</span>
+        <Card className="bg-black/50 border-amber-900/30 mb-4 sm:mb-6">
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-amber-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+              <span className="text-base sm:text-lg">Select Song ({songs.length} available)</span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={loadSongs}
-                className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent"
+                className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent self-start sm:self-auto"
               >
                 <Loader className="w-4 h-4" />
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-h-64 sm:max-h-80 lg:max-h-96 overflow-y-auto">
               {songs.map(song => (
                 <SongCard
                   key={song.id}
@@ -344,11 +346,11 @@ export default function GuitarTabsPlayer() {
         {selectedSong && (
           <>
             {/* Song Info */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-amber-400 mb-2">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-amber-400 mb-2">
                 {selectedSong.title} - {selectedSong.artist}
               </h2>
-              <div className="flex items-center space-x-4 text-gray-300">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm sm:text-base text-gray-300">
                 <span>Key: <strong className="text-amber-400">{currentKey}</strong></span>
                 <span>Capo: <strong className="text-amber-400">{capo > 0 ? `${capo}` : 'None'}</strong></span>
                 <span>Difficulty: <strong className="text-amber-400">{selectedSong.difficulty}</strong></span>
@@ -357,20 +359,20 @@ export default function GuitarTabsPlayer() {
             </div>
 
             {/* Controls */}
-            <Card className="bg-black/50 border-amber-900/30 mb-6">
-              <CardHeader>
-                <CardTitle className="text-amber-400 flex items-center space-x-2">
-                  <Settings className="w-5 h-5" />
+            <Card className="bg-black/50 border-amber-900/30 mb-4 sm:mb-6">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-amber-400 flex items-center space-x-2 text-base sm:text-lg">
+                  <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Playback Controls</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                   {/* Playback Controls */}
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-center sm:justify-start space-x-2">
                     <Button 
                       onClick={togglePlayback} 
-                      className="bg-amber-500 hover:bg-amber-600 text-black"
+                      className="bg-amber-500 hover:bg-amber-600 text-black text-sm sm:text-base px-3 sm:px-4 py-2"
                     >
                       {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                       <span className="ml-2">{isPlaying ? 'Pause' : 'Play'}</span>
@@ -378,15 +380,15 @@ export default function GuitarTabsPlayer() {
                     <Button
                       variant="outline"
                       onClick={resetSong}
-                      className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent"
+                      className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent px-3 sm:px-4 py-2"
                     >
                       <RotateCcw className="w-4 h-4" />
                     </Button>
                   </div>
 
                   {/* Speed Control */}
-                  <div className="flex items-center space-x-2">
-                    <label className="text-sm font-medium text-gray-300">Speed:</label>
+                  <div className="flex items-center justify-center sm:justify-start space-x-2">
+                    <label className="text-xs sm:text-sm font-medium text-gray-300 min-w-[45px]">Speed:</label>
                     <input
                       type="range"
                       min="0.1"
@@ -394,30 +396,30 @@ export default function GuitarTabsPlayer() {
                       step="0.1"
                       value={scrollSpeed}
                       onChange={(e) => setScrollSpeed(Number(e.target.value))}
-                      className="w-24 accent-amber-400"
+                      className="w-20 sm:w-24 accent-amber-400"
                     />
-                    <span className="text-sm text-gray-400 min-w-[50px]">{scrollSpeed}s</span>
+                    <span className="text-xs sm:text-sm text-gray-400 min-w-[45px]">{scrollSpeed}s</span>
                   </div>
 
                   {/* Transpose Controls */}
-                  <div className="flex items-center space-x-2">
-                    <label className="text-sm font-medium text-gray-300">Transpose:</label>
+                  <div className="flex items-center justify-center sm:justify-start space-x-2">
+                    <label className="text-xs sm:text-sm font-medium text-gray-300 min-w-[65px]">Transpose:</label>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleTranspose("down")}
-                      className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent"
+                      className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent px-2 py-1"
                     >
                       <Minus className="w-3 h-3" />
                     </Button>
-                    <span className="text-sm font-mono min-w-[50px] text-center text-amber-400">
+                    <span className="text-xs sm:text-sm font-mono min-w-[40px] sm:min-w-[50px] text-center text-amber-400">
                       {transpose > 0 ? `+${transpose}` : transpose}
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleTranspose("up")}
-                      className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent"
+                      className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black bg-transparent px-2 py-1"
                     >
                       <Plus className="w-3 h-3" />
                     </Button>
@@ -426,33 +428,33 @@ export default function GuitarTabsPlayer() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className={`grid grid-cols-1 ${isMobile ? 'space-y-4' : 'xl:grid-cols-3'} gap-4 sm:gap-6`}>
               {/* Main Tab Content */}
-              <div className="lg:col-span-2">
+              <div className={`${isMobile ? 'order-1' : 'xl:col-span-2'}`}>
                 <Card className="bg-black/50 border-amber-900/30">
-                  <CardHeader>
-                    <CardTitle className="text-amber-400">Guitar Tab</CardTitle>
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="text-amber-400 text-base sm:text-lg">Guitar Tab</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="font-mono text-sm bg-gray-900/50 p-6 rounded-lg border border-amber-900/20" ref={lyricsRef}>
+                    <div className="font-mono text-xs sm:text-sm bg-gray-900/50 p-3 sm:p-4 lg:p-6 rounded-lg border border-amber-900/20 overflow-x-auto" ref={lyricsRef}>
                       {transposedLyrics.map((lyricLine, index) => (
                         <div
                           key={index}
-                          className={`mb-6 transition-all duration-300 ${
-                            index === currentLine ? "bg-amber-900/30 p-3 rounded-lg shadow-lg" : ""
+                          className={`mb-4 sm:mb-6 transition-all duration-300 ${
+                            index === currentLine ? "bg-amber-900/30 p-2 sm:p-3 rounded-lg shadow-lg" : ""
                           }`}
                         >
                           {/* Chord line */}
-                          <div className="flex text-amber-400 font-bold mb-1 text-lg">
+                          <div className="flex text-amber-400 font-bold mb-1 text-sm sm:text-base lg:text-lg overflow-x-auto">
                             {lyricLine.chords.map((chord, chordIndex) => (
-                              <span key={chordIndex} className="inline-block min-w-[80px] text-center">
+                              <span key={chordIndex} className="inline-block min-w-[60px] sm:min-w-[80px] text-center flex-shrink-0">
                                 {chord}
                               </span>
                             ))}
                           </div>
 
                           {/* Lyrics line */}
-                          <div className="text-white text-lg font-mono leading-relaxed">
+                          <div className="text-white text-sm sm:text-base lg:text-lg font-mono leading-relaxed overflow-x-auto">
                             {lyricLine.line}
                           </div>
                         </div>
@@ -463,37 +465,40 @@ export default function GuitarTabsPlayer() {
               </div>
 
               {/* Chord Dictionary Sidebar */}
-              <div className="lg:col-span-1">
-                <Card className="bg-black/50 border-amber-900/30 sticky top-4">
-                  <CardHeader>
-                    <CardTitle className="text-amber-400">Chord Charts</CardTitle>
+              <div className={`${isMobile ? 'order-2' : 'xl:col-span-1'}`}>
+                <Card className={`bg-black/50 border-amber-900/30 ${!isMobile ? 'xl:sticky xl:top-4' : ''}`}>
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <CardTitle className="text-amber-400 text-base sm:text-lg">Chord Charts</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className={`space-y-3 sm:space-y-4 ${isMobile ? 'max-h-[300px]' : 'max-h-[400px] sm:max-h-[500px] xl:max-h-[600px]'} overflow-y-auto`}>
                       {currentChords.length > 0 ? (
-                        currentChords.map((chord) => (
-                          <div key={chord} className="bg-gray-800 p-4 rounded-lg border border-amber-900/20">
-                            <h3 className="text-amber-400 font-bold text-lg mb-3 text-center">{chord}</h3>
-                            <div className="flex justify-center">
-                              <img
-                                src={getChordImagePath(chord)}
-                                alt={`${chord} chord diagram`}
-                                className="max-w-full h-auto rounded border border-amber-900/30"
-                                onError={(e) => {
-                                  e.currentTarget.style.display = 'none'
-                                  e.currentTarget.nextElementSibling.style.display = 'block'
-                                }}
-                              />
-                              <div className="text-center text-gray-400 text-sm hidden">
-                                Diagram not available
+                        <div className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-2 xl:grid-cols-1'} gap-3 sm:gap-4`}>
+                          {currentChords.map((chord) => (
+                            <div key={chord} className={`bg-gray-800 ${isMobile ? 'p-2' : 'p-3 sm:p-4'} rounded-lg border border-amber-900/20`}>
+                              <h3 className={`text-amber-400 font-bold ${isMobile ? 'text-sm' : 'text-base sm:text-lg'} mb-2 sm:mb-3 text-center`}>{chord}</h3>
+                              <div className="flex justify-center">
+                                <img
+                                  src={getChordImagePath(chord)}
+                                  alt={`${chord} chord diagram`}
+                                  className={`max-w-full h-auto rounded border border-amber-900/30 ${isMobile ? 'max-h-16' : 'max-h-24 sm:max-h-32 xl:max-h-40'}`}
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none'
+                                    const nextElement = e.currentTarget.nextElementSibling as HTMLElement
+                                    if (nextElement) nextElement.style.display = 'block'
+                                  }}
+                                />
+                                <div className="text-center text-gray-400 text-xs sm:text-sm hidden">
+                                  Diagram not available
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))
+                          ))}
+                        </div>
                       ) : (
-                        <div className="text-center text-gray-400 py-8">
-                          <Music2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>No chords found in this song</p>
+                        <div className="text-center text-gray-400 py-6 sm:py-8">
+                          <Music2 className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                          <p className="text-sm sm:text-base">No chords found in this song</p>
                         </div>
                       )}
                     </div>
@@ -505,9 +510,9 @@ export default function GuitarTabsPlayer() {
         )}
 
         {/* Footer */}
-        <div className="mt-12 text-center text-gray-400">
-          <p>Practice with auto-scroll and transpose features</p>
-          <p className="text-sm mt-2">Transpose to find the perfect key for your voice</p>
+        <div className="mt-8 sm:mt-12 text-center text-gray-400 px-4">
+          <p className="text-sm sm:text-base">Practice with auto-scroll and transpose features</p>
+          <p className="text-xs sm:text-sm mt-1 sm:mt-2">Transpose to find the perfect key for your voice</p>
         </div>
       </div>
     </div>

@@ -3,8 +3,9 @@
 import type React from "react"
 import { CustomCursor } from "./custom-cursor"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm, ValidationError } from '@formspree/react'
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { X, User, Mail, Phone, Calendar, MapPin } from "lucide-react"
@@ -15,10 +16,12 @@ interface RegistrationFormProps {
   workshopTitle?: string
 }
 //use dotenv 
-const formspree_id = process.env.NEXT_PUBLIC_FORMSPREE_ID;
+const formspree_id = process.env.NEXT_PUBLIC_FORMSPREE_ID || "xvgqrvqz";
 
 export function RegistrationForm({ isOpen, onClose, workshopTitle = "Guitar Workshop" }: RegistrationFormProps) {
+  const router = useRouter()
   const [state, handleSubmit] = useForm(formspree_id)
+  const [showSuccess, setShowSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     emailId: "",
@@ -31,7 +34,38 @@ export function RegistrationForm({ isOpen, onClose, workshopTitle = "Guitar Work
     message: "",
   })
 
-  if (state.succeeded) {
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      emailId: "",
+      contactNumber: "",
+      dateOfBirth: "",
+      cityAndState: "",
+      experienceWithGuitar: "",
+      registeredForRole: "workshop",
+      workshopId: "",
+      message: "",
+    })
+    setShowSuccess(false)
+  }
+
+  const handleClose = () => {
+    resetForm()
+    onClose()
+    router.push("/")
+  }
+
+  // Reset form when modal is closed or when form is successful
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm()
+    }
+    if (state.succeeded && !showSuccess) {
+      setShowSuccess(true)
+    }
+  }, [isOpen, state.succeeded, showSuccess])
+
+  if (showSuccess) {
     return (
       
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
@@ -39,13 +73,13 @@ export function RegistrationForm({ isOpen, onClose, workshopTitle = "Guitar Work
           <CustomCursor />
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-amber-400">Registration Successful!</CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={handleClose}>
               <X className="w-4 h-4" />
             </Button>
           </CardHeader>
           <CardContent>
             <p className="text-white text-center">Thanks for registering for {workshopTitle}!</p>
-            <Button onClick={onClose} className="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-black font-semibold">
+            <Button onClick={handleClose} className="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-black font-semibold">
               Close
             </Button>
           </CardContent>
@@ -62,7 +96,7 @@ export function RegistrationForm({ isOpen, onClose, workshopTitle = "Guitar Work
         <CustomCursor />
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-amber-400">Register for {workshopTitle}</CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={handleClose}>
             <X className="w-4 h-4" />
           </Button>
         </CardHeader>
